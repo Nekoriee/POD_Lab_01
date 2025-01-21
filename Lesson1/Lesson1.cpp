@@ -37,23 +37,43 @@ double integrate(double a, double b) {
 #include <iostream>
 int main(int argc, char** argv)
 {
-    std::cout << max_threads << "\n";
-    for (size_t i = 0; i < max_threads + 1; i++) {
-        std::cout << "Thread num: " << i << "\n";
+    //std::cout << max_threads << "\n";
+
+    //for (size_t i = 0; i < max_threads + 1; i++) {
+    //    std::cout << "Thread num: " << i << "\n";
+    //    for (size_t j = 0; j < 20; j++) {
+    //        if (i > 0) {
+    //            double t1 = omp_get_wtime();
+    //            integrate_par(-1, 1, i);
+    //            double t2 = omp_get_wtime();
+    //            std::cout << t2 - t1 << "\n";
+    //        }
+    //        else {
+    //            double t1 = omp_get_wtime();
+    //            integrate(-1, 1);
+    //            double t2 = omp_get_wtime();
+    //            std::cout << t2 - t1 << "\n";
+    //        }
+    //        
+    //    }
+    //}
+    double t1 = omp_get_wtime();
+    double result = integrate(-1, 1);
+    double t2 = omp_get_wtime() - t1;
+    std::cout << "integrate: T = 1, value = " << result << ", duration = " << t2 << "s, acceleration = 1\n";
+
+    double duration1 = t2;
+
+    for (std::size_t i = 2; i <= std::thread::hardware_concurrency(); i++)
+    {
         for (size_t j = 0; j < 20; j++) {
-            if (i > 0) {
-                double t1 = omp_get_wtime();
-                integrate_par(-1, 1, i);
-                double t2 = omp_get_wtime();
-                std::cout << t2 - t1 << "\n";
-            }
-            else {
-                double t1 = omp_get_wtime();
-                integrate(-1, 1);
-                double t2 = omp_get_wtime();
-                std::cout << t2 - t1 << "\n";
-            }
-            
+            omp_set_num_threads(i);
+            t1 = omp_get_wtime();
+            result = integrate_par(-1, 1, i);
+            t2 = omp_get_wtime() - t1;
+
+            std::cout << "T = " << i << ", value = " << result
+                << ", duration = " << t2 << ", acceleration = " << duration1 / t2 << "\n";
         }
     }
     return 0;
