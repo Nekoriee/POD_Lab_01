@@ -57,23 +57,18 @@ int main(int argc, char** argv)
     //        
     //    }
     //}
-    double t1 = omp_get_wtime();
-    double result = integrate(-1, 1);
-    double t2 = omp_get_wtime() - t1;
-    //std::cout << "integrate: T = 1, value = " << result << ", duration = " << t2 << ", acceleration = 1\n";
-
-    double duration1 = t2;
+    double result;
+    auto duration1 = std::chrono::steady_clock::now();
 
     double time_sum_1;
     for (std::size_t i = 1; i <= std::thread::hardware_concurrency(); i++)
     {
         double time_sum = 0;
         for (size_t j = 0; j < 20; j++) {
-            //omp_set_num_threads(i);
             auto t1 = std::chrono::steady_clock::now();
             result = integrate_par(-1, 1, i);
             auto t2 = std::chrono::steady_clock::now();
-            time_sum += std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+            time_sum += std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count();
 
             
         }
